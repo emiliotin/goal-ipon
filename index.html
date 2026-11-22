@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10251d">
+<title>Goal Ipon</title>
+<style>
+:root{--bg:#f3f7f4;--card:#fff;--ink:#17251e;--muted:#68776e;--green:#16834b;--line:#e1e9e3;--soft:#eaf5ee}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:560px;margin:auto;padding:20px 16px 36px}.top{background:#10251d;color:white;padding:24px 20px;border-radius:22px;margin-bottom:16px}
+.kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#b8d9c5;font-weight:700}
+h1{font-size:28px;margin:5px 0 4px}.sub{color:#d2e3d8;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:13px 0;box-shadow:0 4px 18px #153b2510}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}
+input{width:100%;padding:13px;border:1px solid #ccd9cf;border-radius:11px;font-size:16px;background:#fff;color:var(--ink)}
+input:focus{outline:2px solid #9acbab;border-color:var(--green)}
+button{border:0;border-radius:12px;padding:13px 16px;background:var(--green);color:white;font-size:15px;font-weight:700;cursor:pointer}
+button.secondary{background:var(--soft);color:#17633b}button.danger{background:#fff0ef;color:#a52a24}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.big{font-size:32px;font-weight:800;letter-spacing:-.03em;margin:4px 0}
+.muted{color:var(--muted);font-size:13px}.bar{height:12px;background:#e8eee9;border-radius:20px;overflow:hidden;margin:12px 0}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#16834b,#55b879);border-radius:20px;transition:width .2s}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#f7faf7;border-radius:12px;padding:12px}.stat strong{display:block;font-size:19px;margin-top:4px}
+h2{font-size:18px;margin:0 0 8px}.hint{font-size:12px;color:var(--muted);line-height:1.5}
+#history{padding:0;list-style:none;margin:10px 0 0}#history li{display:flex;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+#history li:last-child{border-bottom:0}.empty{color:var(--muted);font-size:13px;padding:12px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+footer{text-align:center;color:var(--muted);font-size:11px;line-height:1.5;padding:12px}
+</style>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#10251d">
+  <link rel="icon" href="icon-192.png">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">Personal savings tracker</div>
+    <h1>Goal Ipon 🎯</h1>
+    <div class="sub">Maliit na hakbang araw-araw, papalapit sa goal mo.</div>
+  </header>
+
+  <section class="card">
+    <h2>Itakda ang goal mo</h2>
+    <label for="goal">Target na ipon (₱)</label>
+    <input id="goal" type="number" min="1" step="1" value="100000">
+    <label for="saved">Kasalukuyang ipon (₱)</label>
+    <input id="saved" type="number" min="0" step="1" value="11000">
+    <label for="daily">Planong itabi bawat araw (₱)</label>
+    <input id="daily" type="number" min="0" step="1" value="2000">
+    <label for="deadline">Target na petsa (optional)</label>
+    <input id="deadline" type="date">
+    <div class="actions"><button id="saveSettings">I-save ang goal</button></div>
+    <p class="hint">Puwede mong baguhin ang target at daily savings anumang oras.</p>
+  </section>
+
+  <section class="card">
+    <div class="muted">Progress mo</div>
+    <div class="big" id="progressMoney">₱11,000</div>
+    <div class="muted" id="ofGoal">ng ₱100,000 goal</div>
+    <div class="bar"><div class="fill" id="barFill"></div></div>
+    <div class="row stats">
+      <div class="stat"><span class="muted">Naabot na</span><strong id="percent">11%</strong></div>
+      <div class="stat"><span class="muted">Kulang pa</span><strong id="remaining">₱89,000</strong></div>
+      <div class="stat"><span class="muted">Araw na kailangan</span><strong id="days">45 days</strong></div>
+      <div class="stat"><span class="muted">Estimated total</span><strong id="estimate">—</strong></div>
+    </div>
+    <p class="hint" id="deadlineNote"></p>
+  </section>
+
+  <section class="card">
+    <h2>Magdagdag ng naipon</h2>
+    <label for="deposit">Halagang idadagdag (₱)</label>
+    <input id="deposit" type="number" min="1" step="1" placeholder="Halimbawa: 500">
+    <label for="note">Note (optional)</label>
+    <input id="note" type="text" maxlength="50" placeholder="Hal. ipon ngayong araw">
+    <div class="actions"><button id="addDeposit">Idagdag sa ipon</button></div>
+    <p class="hint">Ilagay lang ang totoong halagang naitabi mo na.</p>
+  </section>
+
+  <section class="card">
+    <h2>Kasaysayan ng ipon</h2>
+    <ul id="history"></ul>
+    <div class="actions"><button class="secondary" id="export">I-download ang record (CSV)</button><button class="danger" id="reset">I-reset ang data</button></div>
+  </section>
+  <footer>Naka-save ang data sa browser ng device na ito. Huwag maglagay ng password, bank details, o sensitibong impormasyon. Ang tracker ay pang-record lang at hindi financial account.</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const peso=n=>'₱'+Math.round(Number(n)||0).toLocaleString('en-PH');
+const today=()=>new Date().toISOString().slice(0,10);
+let data={goal:100000,saved:11000,daily:2000,deadline:'',history:[]};
+try{const old=JSON.parse(localStorage.getItem('goalIponData'));if(old&&typeof old==='object')data={...data,...old};}catch(e){}
+function persist(){localStorage.setItem('goalIponData',JSON.stringify(data));}
+function render(){
+ $('goal').value=data.goal;$('saved').value=data.saved;$('daily').value=data.daily;$('deadline').value=data.deadline||'';
+ const goal=Math.max(1,Number(data.goal)||1),saved=Math.max(0,Number(data.saved)||0),daily=Math.max(0,Number(data.daily)||0);
+ const remaining=Math.max(0,goal-saved),pct=Math.min(100,saved/goal*100);
+ $('progressMoney').textContent=peso(saved);$('ofGoal').textContent='ng '+peso(goal)+' goal';
+ $('barFill').style.width=pct+'%';$('percent').textContent=pct.toFixed(1)+'%';$('remaining').textContent=peso(remaining);
+ $('days').textContent=remaining===0?'Goal reached!':daily>0?Math.ceil(remaining/daily)+' days':'—';
+ $('estimate').textContent=daily>0?peso(saved+daily*30):'—';
+ let note='';
+ if(data.deadline){const end=new Date(data.deadline+'T23:59:59'),now=new Date();const days=Math.max(0,Math.ceil((end-now)/(86400000)));note=remaining===0?'Naabot mo na ang goal mo!':days>0?`May ${days} araw hanggang target date. Para maabot ito, kailangan ng average na ${peso(remaining/days)} kada araw.`:'Lumipas na ang target date. Puwede kang magtakda ng bagong petsa.';}
+ $('deadlineNote').textContent=note;
+ const hist=$('history');hist.innerHTML='';
+ if(!data.history.length){hist.innerHTML='<li class="empty">Wala pang naitatala. Magdagdag kapag may naitabi ka na.</li>';}
+ else [...data.history].reverse().forEach((x,i)=>{const li=document.createElement('li'),left=document.createElement('span'),right=document.createElement('strong');left.textContent=(x.date||'')+' · '+(x.note||'Ipon');right.textContent='+'+peso(x.amount);li.append(left,right);hist.append(li);});
+}
+$('saveSettings').onclick=()=>{const g=Number($('goal').value),s=Number($('saved').value),d=Number($('daily').value);if(!Number.isFinite(g)||g<=0||!Number.isFinite(s)||s<0||!Number.isFinite(d)||d<0){alert('Pakilagay ang wastong halaga.');return;}data.goal=g;data.saved=s;data.daily=d;data.deadline=$('deadline').value;persist();render();alert('Na-save ang goal mo!');};
+$('addDeposit').onclick=()=>{const amount=Number($('deposit').value);if(!Number.isFinite(amount)||amount<=0){alert('Maglagay ng halagang higit sa zero.');return;}data.saved=Number(data.saved||0)+amount;data.history.push({amount,date:today(),note:$('note').value.trim()});persist();$('deposit').value='';$('note').value='';render();};
+$('reset').onclick=()=>{if(confirm('Sigurado ka bang burahin ang lahat ng record sa app na ito? Hindi ito mare-recover.')){data={goal:100000,saved:0,daily:0,deadline:'',history:[]};persist();render();}};
+$('export').onclick=()=>{const rows=[['Date','Amount','Note'],...data.history.map(x=>[x.date,x.amount,(x.note||'').replaceAll('"','""')])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='goal-ipon-record.csv';a.click();URL.revokeObjectURL(url);};
+render();
+</script>
+<script>
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
